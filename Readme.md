@@ -414,19 +414,3 @@ To simply install any library, in a python console use the command
 #### Setting up the total station : Activate communication
 a remplir pour différentes version de Leica
 
-
-Full installation
------------------
-
-
-Functioning of the prototype
-----------------------------
-
-
-FreeCad files
--------------
-
-The FreeCad files used for the creation of the two 3D printed parts mounted on the UAV are stored in (__Name of the folder__)
-
-These supports have been printed with a Prusa MK3.
-
