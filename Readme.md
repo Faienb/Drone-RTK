@@ -65,12 +65,10 @@ In this chapter, all the material we used for this prototype is detailed.
     - Directly attached to the support (3)
 
 5. 3D printed support for the UBlox radio transmitter and Cellular chip
-    - elements qui vont dedans
 
 ![alt text](0_IMAGES/3DprintedMount.png "3D printed support")
 
 6. CellularLine PowerBank
-    - Mettre les specs de la batterie portable
 
 ![alt text](0_IMAGES/CellularLine.png "PowerBank")
 
