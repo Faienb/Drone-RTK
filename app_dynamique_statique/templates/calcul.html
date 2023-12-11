@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+<script type=text/javascript src="{{url_for('static', filename='js/jquery.min.js') }}"></script>
+    <div class='container'>
+        <h3>Test v0 app DroneRTK</h3>
+        <!--Coder des boutons de couleurs pour les différentes itérations -->
+          Résultats de la mise en station :  {{ resultat }}
+              <form action="/redo/" method="post"><button name="RedoBtn" type="submit">Nouvelle acquisition</button></form>
+  </body>
+</html>

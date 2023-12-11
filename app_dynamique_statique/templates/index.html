@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .divAcquis {
+        border: 5px outset red;
+        background-color: lightblue;
+        text-align: center;
+      }
+      .divCalcul {
+        border: 5px outset red;
+        background-color: lightblue;
+        text-align: center;
+      }
+      .divRes {
+        border: 5px outset red;
+        background-color: lightblue;
+        text-align: center;
+      }
+      .divOK{
+        border: 1px ;
+        background-color: lightgreen;
+        text-align: center;
+      }
+      .divNotOK{
+        border: 1px ;
+        background-color: red;
+        text-align: center;
+      }
+      .divPresqueOK{
+        border: 1px ;
+        background-color: orange;
+        text-align: center;
+      }
+      .divIter{
+        border: 1px ;
+        background-color: gray;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+<script type=text/javascript src="{{url_for('static', filename='js/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/socket.io.js') }}"></script>
+<script>
+$(document).ready(function(){
+    //connect to the socket server.
+    var socket = io.connect('http://' + document.domain + ':' + location.port + '/getInfo');
+
+
+ //Get Info every sec
+    window.setInterval(function(){
+        socket.emit('ctrl', {cmd: 'info'});
+    }, 1000);
+
+
+
+//receive details from server
+    socket.on('info', function(msg) {
+      console.log("Received info : " + msg.GPS_connect);
+        //var jsonObj = $.parseJSON(msg);
+        if(msg.GPS_connect == 'OK'){
+            document.getElementById("GPS_connect").className = "divOK";
+        }
+        if(msg.GPS_connect == 'NO'){
+            document.getElementById("GPS_connect").className = "divNotOK";
+        }
+        if(msg.Tacheo_connect == 'OK'){
+            document.getElementById("Tacheo_connect").className = "divOK";
+        }
+        if(msg.Tacheo_connect == 'NO'){
+            document.getElementById("Tacheo_connect").className = "divNotOK";
+        }
+        if(msg.RTK == 'OK'){
+            document.getElementById("RTK").className = "divOK";
+        }
+        if(msg.RTK == 'FLOAT'){
+            document.getElementById("RTK").className = "divPresqueOK";
+        }
+        if(msg.RTK == 'NO'){
+            document.getElementById("RTK").className = "divNotOK";
+        }
+        if(msg.Echelle != '0'){
+            document.getElementById("Echelle").className = "divOK";
+            document.getElementById("Echelle").innerHTML = "Facteur d'échelle : "+msg.Echelle;
+        }
+        if(msg.Echelle == '0'){
+            document.getElementById("Echelle").className = "divNotOK";
+            document.getElementById("Echelle").innerHTML = "Facteur d'échelle";
+        }
+        if(msg.Prisme_lock_and_compensateur == 'OK'){
+            document.getElementById("Prisme_lock_et_compensateur").className = "divOK";
+        }
+        if(msg.Prisme_lock_and_compensateur == 'NO'){
+            document.getElementById("Prisme_lock_et_compensateur").className = "divNotOK";
+        }
+        if(msg.Enregistrement_des_points == 'OK'){
+            document.getElementById("Enregistrement_des_points").className = "divOK";
+        }
+        if(msg.Enregistrement_des_points == 'NO'){
+            document.getElementById("Enregistrement_des_points").className = "divNotOK";
+        }
+        if(msg.Nombre_GPS){
+            document.getElementById("nb_points_GPS").innerHTML = "Nombre de points GPS RTK : " +msg.Nombre_GPS;
+        }
+        if(msg.Nombre_points_GNSS != '0'){
+            document.getElementById("nb_points_GNSS").innerHTML = "Nombre de points GNSS utilisés pour la mise en station : " + msg.Nombre_points_GNSS;
+        }
+        if(msg.Nombre_points_Tacheo != '0'){
+            document.getElementById("nb_points_Tacheo").innerHTML = "Nombre de points tachéo utilisés pour la mise en station : " + msg.Nombre_points_Tacheo;
+            document.getElementById("download_link").style.visibility = "visible"
+        }
+        if(msg.Nombre_points_Tacheo == '0'){
+            document.getElementById("download_link").style.visibility = "hidden"
+        }
+    });
+
+});
+</script>
+
+
+
+    <div class='divAcquis' id='acquisition'>
+      <h3>Test v1.4 app DroneRTK</h3>
+            Mise en station d'une station totale avec une orientation faite à l'aide d'un drone équipé d'un prisme et d'une antenne GNSS<br>
+      <form action="/acquisition/" method="post"><button name="AcquisitionBtn" type="submit">Acquisition</button></form>
+            <h3>{{ info }}</h3>
+            <!--Mettre du ajax pour changer la coucleur du div en fonction des etats RTK du code Python qui tourne derrière-->
+            <div class = 'divNotOK' id='GPS_connect'>GPS connecté</div>
+            <div class = 'divNotOK' id='Tacheo_connect'>Station totale connectée</div>
+            <div class = 'divNotOK' id='RTK'>RTK</div>
+            <div class = 'divNotOK' id='Echelle'>Facteur d'échelle</div>
+            <div class = 'divNotOK' id='Prisme_lock_et_compensateur'>Prisme locké</div>
+            <div class = 'divNotOK' id='Enregistrement_des_points'>Enregistrement des points</div>
+            <div class = 'divIter' id='nb_points_GPS'> Nombre de points GPS RTK : 0</div>
+
+            <br>
+            Lorsque l'acquisition nous suffit, on appuie sur le bouton calcul pour lancer le calcul de la solution par Ransac/ICP
+            <!--modifier code avec ajax et faire des boutons de couleurs rouger et vert ici pour dire si RTK, si théo, ... Pourqoi pas un cmpteur de points aussi-->
+    </div><br>
+
+
+
+
+
+    <div class='divCalcul' id='calcul'>
+            <form action="/calcul/" method="post">
+              <h4>Type d'acquisition</h4>
+              <input type="radio" id="STAT" name="AcquisType" value="STAT" checked = "checked">
+              <label for="STAT">Statique</label>
+              <input type="radio" id="DYN" name="AcquisType" value="DYN">
+              <label for="DYN">Dynamique</label><br><br>
+              Ecart centre de prisme->centre de phase de l'antenne [mm] : <input name="ecart" type="number" value="50"><br>
+            <button name="CalculBtn" type="submit">Calcul</button></form>
+            <div class = 'divIter' id='nb_points_GNSS'>Nombre de points GNSS utilisés pour la mise en station : 0</div>
+            <div class = 'divIter' id='nb_points_Tacheo'>Nombre de points Tachéo utilisés pour la mise en station : 0</div>
+
+    </div><br>
+
+    <div class='divRes' id='résultat'>
+        <form action="/redo/" method="post"><button name="RedoBtn" type="submit">Mise en station</button></form>
+        <a id='download_link' href="/download/">Télécharger le fichier résultat</a><br>
+        Résultats de la mise en station :<br>
+        E MN95 : {{ res_E }} [m]<br>
+        N MN95 : {{ res_N }} [m]<br>
+        H RAN95 : {{ res_H }} [m]<br>
+        G0 : {{ res_g0 }} [gons]<br>
+        Fitness : {{res_fitness}} [%] <br>
+        RMS : {{res_rmse}} [mm] <br>
+        Correspondence Set Size : {{res_corres}} [Nombre de données tachéo dans les tolérances de l'ICP] <br>
+        
+        <img src="{{image}}" alt="Graphique résultat de l'ICP"/>
+    </div>
+
+
+
+  </body>
+</html>
