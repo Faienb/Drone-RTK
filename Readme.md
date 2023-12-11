@@ -55,7 +55,7 @@ In this chapter, all the material we used for this prototype is detailed.
 
 3. antenna and prism support
     - Metallic mount used to attach the support to the UAV
-    - 3D printed support __Mettre le lien pour le fichier FreeCad__
+    - 3D printed support
     - GNSS antenna fixed on top of the support
     - Prism screwed underneath the support
 
