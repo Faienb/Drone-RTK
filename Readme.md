@@ -411,6 +411,3 @@ To simply install any library, in a python console use the command
 17. copy : deepcopies of python objects (already installed on Miniconda)
 18. fpdf : creating pdf result file 
 
-#### Setting up the total station : Activate communication
-a remplir pour différentes version de Leica
-
