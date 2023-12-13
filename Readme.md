@@ -1,31 +1,3 @@
-voir ce site pour ajouter les droits sur les ports https://arduino.stackexchange.com/questions/21215/first-time-set-up-permission-denied-to-usb-port-ubuntu-14-04
-pour activer le port ttySO (uart du rpi), ajouter dans le fichier /boot/firmware/config.txt à la fin enable_uart=1
-activer hotspot
-lancer les bonnes commande dans /etc/rc.local
-Pour voir les erreurs dans rc.local -> systemctl status rc-local.service
-installer miniconda :https://github.com/conda-forge/miniforge/#download
-
-Pour installer open3d sur ubuntu 20.10 arm: http://www.open3d.org/docs/latest/arm.html
-sudo apt-get update -y
-sudo apt-get install -y apt-utils build-essential git cmake
-sudo apt-get install -y python3 python3-dev python3-pip
-sudo apt-get install -y xorg-dev libglu1-mesa-dev
-sudo apt-get install -y libblas-dev liblapack-dev liblapacke-dev
-sudo apt-get install -y libsdl2-dev libc++-7-dev libc++abi-7-dev libxi-dev
-sudo apt-get install -y clang-7
-pip install cmake
-# Clone
-git clone --recursive https://github.com/isl-org/Open3D
-cd Open3D
-git submodule update --init --recursive
-mkdir build
-cd build
-
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_CUDA_MODULE=OFF -DBUILD_GUI=OFF -DBUILD_TENSORFLOW_OPS=OFF -DBUILD_PYTORCH_OPS=OFF -DBUILD_UNIT_TESTS=ON -DCMAKE_INSTALL_PREFIX=~/open3d_install -DPYTHON_EXECUTABLE=$(which python3) -DUSE_BLAS=ON -DBUILD_FILAMENT_FROM_SOURCE=ON -DCMAKE_CXX_FLAGS_RELEASE=ON -DCMAKE_CXX_FLAGS_RELEASE="-O3 -DNDEBUG -faligned-new"  \    ..
-make -j 1 (essayer sans ça)
-make install-pip-package -j 1
-
-
 Free stationing of a robotic total station by RTK drone
 =======================================================
 Setting up a total station can in some cases be very time consuming, for example in a city with not enough known coordinates points or in a forest. In these situations, surveyors usually measure a few points on the ground with a GNSS rover (in RTK mode) and use these points afterwards to set up the total station. However, there are a risks of setting up a device on poorly measured points due to multipath (in cities) or poor GNSS coverage (in forests or urban corridor). The new method we propose uses a quadcopter drone (UAV) equipped with a GNSS receiver in RTK mode (10Hz frequency) and a mini prism 360, with the total station measuring the UAV at a 10Hz frequency. The whole system is automatically controlled by a Raspberry Pi developed in Python (free license) which creates a server accessible from a smartphone allowing the operator to follow and control the acquisition, have good information of precision and reliability. Furthermore, the 3D coordinates of the free station are automatically calculated and pushed to the total station to set the new coordinates and orientation of the instrument. Finally, a result file designed to apprehend the quality of the set up of the instrument is created. Once this process is completed, the total station is ready to measure with its new stationing. The usage of the drone allows positioning in places where GNSS coverage is better than at ground level. In order to make the system work in real time, all that is required is a SIM card, the connection information for the RTK correction network and a Leica Geosystems robotic total station. Problems such as time synchronisation and communication between the different parts of the system had to be solved by various methods.
@@ -44,14 +16,10 @@ In this chapter, all the material we used for this prototype is detailed.
     - GeoCom compatible, to be able to send commands to the instrument
     - Leica MS60 used for this prototype
 
-![alt text](0_IMAGES/MS60.png "Leica MS60")
-
 2. Quadcopter drone (UAV)
     - Manually operated
     - Possibility of attaching a bracket for the antenna
     - DJI Inspire 2 used for this prototype
-
-![alt text](0_IMAGES/DJI_INSPIRE2.png "DJI Inspire 2")
 
 3. antenna and prism support
     - Metallic mount used to attach the support to the UAV
@@ -59,65 +27,23 @@ In this chapter, all the material we used for this prototype is detailed.
     - GNSS antenna fixed on top of the support
     - Prism screwed underneath the support
 
-![alt text](0_IMAGES/SUPPORt.png "Support antenne prisme")
-
 4. Mini-prism 360
     - Directly attached to the support (3)
 
 5. 3D printed support for the UBlox radio transmitter and Cellular chip
 
-![alt text](0_IMAGES/3DprintedMount.png "3D printed support")
+6. PowerBank
 
-6. CellularLine PowerBank
-
-![alt text](0_IMAGES/CellularLine.png "PowerBank")
-
-7. Complete radio antenna mounted on the UAV
-    - UBlox processor
-    - ArduiSimple (Je sais pas trop ce que c'est)
-    - Tellit cellular chip
-    - XBee XS868
-
-![alt text](0_IMAGES/RadioAntenna1.png "Radio antenna")
-
-![alt text](0_IMAGES/UBlox_Processor.png "UBlox Processor")
-
-![alt text](0_IMAGES/UBlox_Processor2.png "UBlox Processor")
-
-![alt text](0_IMAGES/ArduiSimple.png "ArduiSimple1")
-
-![alt text](0_IMAGES/ArduiSimple2.png "ArduiSimple2")
-
-![alt text](0_IMAGES/Tellit.png "Cellular antenna")
-
-![alt text](0_IMAGES/XBeeSX868.png "XBee radio antenna")
+7. ArduSimple Simple RTK 2B Pro
 
 8. UBlox ANN-MB series
     - mounted on the prism and antenna support
     - multi-band (L1, L2/E5b/B21) high resolution antenna
     - support GPS, GLONASS, Galileo and Beidou
 
-![alt text](0_IMAGES/UBlox_antenna2.png "UBlox antenna")
-
 10. RaspberryPI4
     - RaspberryPi4 (all the code is stored there)
     - XBee SX868 (radio communication with the other radio mounted on the UAV, getting the GNSS data)
-
-![alt text](0_IMAGES/RaspberryPI4Antenna.png "Raspberry Pi 4 and antenna")
-
-![alt text](0_IMAGES/RaspberryPI4.png "Raspberry PI 4")
-
-![alt text](0_IMAGES/XBeeSX868.png "XBee radio antenna")
-
-
-Assembly
---------
-
-The assembly process is divided in 3 parts. The first part is mounted on the drone and consists of two 3D printed support used for the GNSS measurements and the mounting of the mini-prism 360.
-
-First, a part has top be mounted on the front of the UAV. This part has to be on top of the UAV because the GNSS antenna is fixed on this support. The solution we used on the DJI Inspire 2 is two threaded rod glued to the drone. This part is the point 3 of the previous chapter.
-
-We used the same method to attach the second 3D printed part.
 
 Software
 --------
@@ -362,8 +288,6 @@ enable_uart=1
 pip install open3d flask flask_socketio matplotlib pyserial julian colorama fpdf
 
 #### Configure Wifi hotspot
-en haut à droite, se souvenir des informations de connexion
-Noter l'adresse IP du RPI
 
 sudo nano /etc/NetworkManager/system-connections/Hotspot.nmconnection
 
